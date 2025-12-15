@@ -1,94 +1,94 @@
-# FlowMatch Euler Discrete Scheduler for ComfyUI
+or
 
-9 steps, big res, zero noise.
+# ErosDiffusion — ControlNet Map Cache & Browser
 
-**FlowMatchEulerDiscrete** seems not exposed in ComfyUI, but it is what the official Z-Image demo in diffusers use.
+Lightweight helper nodes for caching, browsing, and re-using ControlNet preprocess maps inside ComfyUI.
 
-So:
+## Overview
 
-- I am exposing it in the scheduler section for you to use within KSampler.
-- On top I provide a node, experimental, to configure the scheduler for use with CustomSampler and play with.
+This package provides two ComfyUI nodes that simplify working with ControlNet maps by caching generated maps to disk and exposing a visual browser:
 
-In short...if you want **sharper and noise free images**, use this!
+- `CacheMapNode` — smart cache layer that checks a disk cache before requesting expensive preprocessors and can save generated maps for reuse.
+- `CacheMapBrowserNode` — sidebar/browser integration to preview and load cached maps (returns image + mask).
+
+These nodes are designed to reduce repeated preprocessing work and help organize map assets by filename and type.
+
+## Key Features
+
+- Cache lookup by filename and map type (supports multiple extensions).
+- `auto` mode detects existing map types and only runs connected preprocessors when needed.
+- `generate_all` option to batch-save all connected preprocessors and the original image.
+- Tagging: comma-separated `tags` input is persisted to a lightweight metadata DB for later retrieval and UI updates.
+- Browser node returns both image and alpha mask (if present) for quick selection.
+
+## Nodes
+
+**CacheMapNode**
+
+- Category: `ErosDiffusion`
+- Returns: `IMAGE` (`map`)
+- Useful inputs (see node UI for full list): `cache_path`, `filename`, `map_type` (auto | depth | canny | ... | browser), `save_if_new`, `force_generation`, `generate_all`, `tags`, `source_<map_type>` image inputs, `source_original`.
+- Behavior summary:
+  - If `map_type` is `browser` the node simply passes through the `source_browser` image.
+  - In `auto` mode it searches cache subfolders for existing maps and only requests the necessary preprocessor inputs on cache miss.
+  - `save_if_new` saves generated maps to `<cache_path>/<type>/<basename>.png`.
+  - `generate_all` forces evaluation of all connected preprocessor inputs and saves them.
+  - Tags are parsed, deduplicated, and stored via the included metadata manager.
+
+**CacheMapBrowserNode**
+
+- Category: `ErosDiffusion`
+- Returns: `IMAGE, MASK` (`image, mask`)
+- Opens a map browser in the ComfyUI sidebar (button on the node). Select a file and the node loads the image and corresponding mask (if any).
+
+## Default Map Types
+
+Default map types are configured in `eros_config.json`. The shipped defaults are:
+
+```
+depth, canny, openpose, lineart, scribble, softedge, normal, seg, shuffle, mediapipe_face, custom
+```
+
+You can customize that list in `eros_config.json` (node will read this file on load).
 
 ## Installation
 
-- use comfy ui manager (search erosDiffusion or ComfyUI-EulerFlowMatchingDiscreteScheduler)
+1. Copy this folder into your ComfyUI `custom_nodes` directory.
+2. Ensure the Python dependencies listed in `requirements.md` are installed.
+3. Restart ComfyUI; the nodes appear under the `ErosDiffusion` category.
 
-or
+## Typical Workflows
 
-- `git clone https://github.com/erosDiffusion/ComfyUI-EulerDiscreteScheduler.git` in your custom nodes folder.
+- Quick reuse: Connect a preprocessor node to `CacheMapNode`'s `source_<type>` and set `filename` to a stable identifier; future runs will load the cached map instead of re-running the preprocessor.
+- Batch export: Enable `generate_all` to save all connected preprocessor outputs and the original image to disk.
+- Browse & inject: Use the `CacheMapBrowserNode` to visually pick maps and feed them into downstream nodes.
 
-Example output (more below)
-<img width="1792" height="1120" alt="example" src="https://github.com/user-attachments/assets/91d4f679-9c9e-40ef-bed6-12bb860c37e7" />
+## Paths & Defaults
 
-## What you get
+- Default cache root (node UI): `<ComfyUI input directory>/maps` (can be changed in the node's `cache_path`).
+- Cache layout: `<cache_path>/<map_type>/<basename>.png` and originals under `<cache_path>/original/`.
 
-- one new scheduler **FlowMatchEulerDiscreteScheduler** registered in the KSampler
-- a custom node that exposes all parameters of the FlowMatchEulerDiscreteScheduler which Outputs **SIGMAS** for use with **SamplerCustom** node.
+## Tags & Metadata
 
-![highlight](https://github.com/user-attachments/assets/249cd15d-f373-46c7-bacb-13a4b5421ba3)
+Provide a comma-separated `tags` string to `CacheMapNode` and tags will be parsed, normalized (deduplicated case-insensitive), and stored in a local metadata DB (see `metadata_manager.py`). The node also notifies the frontend when tags are updated.
 
-## Usage
+## Troubleshooting
 
-- **Simple**: select the FlowMatchEulerDiscreteScheduler in the default workflow from ComfyUI and run.
-- **Advanced/experimental**:
-  1. Add **FlowMatch Euler Discrete Scheduler (Custom)** node to your workflow
-  2. Connect its SIGMAS output to **SamplerCustom** node's sigmas input
-  3. Adjust parameters to control the sampling behavior, you have ALL the parameters to play with.
+- If cached maps are not being found, verify `cache_path` and that filenames use the same basename (node strips extensions when checking).
+- For `auto` mode misses, ensure the corresponding `source_<type>` input is connected so the preprocessor can run and generate the map.
+- If browser doesn't show files, confirm the UI has access to the configured `cache_path` and any `extra_path` you provided.
 
-## Troubleshoot
-- if the scheduler does not appear when you have res4lyf package installed you can try:
-  -- workaround 1: adding an samplerCustom node and connect the sigmas to a  basicScheduler node. this way the scheduler should be available in the list
-  -- workaround 2: disable res4lyf if you don't need that
-  -- workaround 3 use the flowmatch scheduler (custom) and connect to the sigmas of the samplerCustom.
-- if your install fails you might have to use the correct version of peft package, some users reported this as issue, check startup logs and install the proper version
+## Files of interest
 
-## Tech bits:
+- `cache_map_nodes.py` — node implementations (CacheMapNode, CacheMapBrowserNode)
+- `eros_config.json` — map type configuration
+- `metadata_manager.py` — tagging/DB helper
+- `requirements.md` — dependency notes
 
-- https://huggingface.co/docs/diffusers/api/schedulers/flow_match_euler_discrete
-- https://huggingface.co/Tongyi-MAI/Z-Image-Turbo/blob/main/scheduler/scheduler_config.json
+## Contributing
 
-## Find this useful and want to support ?
+PRs welcome. Keep changes focused and add tests/examples where possible.
 
-[Buy me a beer!](https://donate.stripe.com/cNi9ALaASf65clXahPcV201)
+---
 
-<img width="1920" height="1088" alt="ComfyUI_00716_" src="https://github.com/user-attachments/assets/bb2fc530-8a90-4180-96fb-adf6c48f5b09" />
-
-More examples:
-<img width="1536" height="1088" alt="image" src="https://github.com/user-attachments/assets/1ab561e7-b51d-413c-b788-13ed4fb6e129" />
-<img width="1536" height="1088" alt="image" src="https://github.com/user-attachments/assets/1931af7e-1b3e-47c9-ac20-27add5135a71" />
-
-## Changelog
-**1.0.8**
-- attempt fixing incompatibility with res4lyf by adding the scheduler to the list.
-**1.0.7**
-
-- nunchaku qwen patch fix, tiled diffusion patch fix
-  users reported issues with dimensions not being handled correctly, this should fix it.
-
-
-**1.0.6**
-
-- updated example
-- updated pyproject deps (diffusers)
-
-**1.0.5**
-
-- remove bad practice of forking diffusers install on error (requirements.txt and does not rollback your diffusers if available)
-
-**1.0.4**
-
-- add start and end step by Etupa, with some fixes (can be used for image to image or restart sampling)
-  <img width="2880" height="960" alt="node_unknown" src="https://github.com/user-attachments/assets/247cb5ab-241f-43ce-b9d4-61c56ccb3711" />
-
-**1.0.3**
-
-- node publish action
-
-**1.0.2**
-
-- changed the device management in the custom scheduler node to be on gpu (cuda)
-- removed flash attention node dependency from the custom scheduler node
-- removed flash attention node from init
-- added mit licensing
+If you'd like, I can also add a short example flow (JSON) demonstrating a typical `CacheMapNode` + preprocessor setup.
