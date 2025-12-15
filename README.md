@@ -106,8 +106,8 @@ Provide a comma-separated `tags` string to `CacheMapNode` and tags will be parse
 
 ## Contributing
 
-PRs welcome. Keep changes focused and add tests/examples where possible.
+PRs welcome. Keep changes focused and add tests/examples where possible. Test it and tell me what's wrong.
+during the vanilla to lit porting something got off, so there are some regressions.
 
----
 
-If you'd like, I can also add a short example flow (JSON) demonstrating a typical `CacheMapNode` + preprocessor setup.
+
