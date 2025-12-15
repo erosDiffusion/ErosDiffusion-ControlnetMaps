@@ -73,7 +73,7 @@ custom is a passthrough, you can pass whatever you want. original is always meat
   <img width="1424" height="1125" alt="image" src="https://github.com/user-attachments/assets/774d7696-80ee-4136-b094-a540d82a7cab" />
 
 
-## remarks
+## Remarks
 
 - ctrl+click on existing tag adds to the current selected
 - tags are not duplicated
