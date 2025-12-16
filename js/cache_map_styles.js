@@ -78,8 +78,7 @@ export const DRAWER_CSS = `
 
 /* Column 2: Tag Sidebar */
 .eros-tag-sidebar {
-    /* Removed fixed width to allow responsive layout */
-    max-width: 40%;
+    /* max-width: 40%; */
     min-width: 180px;
     border-left: 1px solid #444;
     padding: 20px;
