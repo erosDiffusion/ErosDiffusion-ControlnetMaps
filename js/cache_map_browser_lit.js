@@ -665,7 +665,7 @@ export class ErosLitBrowser extends LitElement {
             ].includes(tab)
           ) {
             this.currentTab = tab;
-            this.settings.currentTab = tab;
+            this.settings = { ...this.settings, currentTab: tab };
           }
           this.selectedFilename = parts[1]; // just the name
         } else {
@@ -920,7 +920,7 @@ export class ErosLitBrowser extends LitElement {
   }
   _handleTab(e) {
     this.currentTab = e.detail.tab;
-    this.settings.currentTab = e.detail.tab;
+    this.settings = { ...this.settings, currentTab: e.detail.tab };
     this.saveSettings();
     this.fetchFiles(true); // Propagate selection update to node
   }
