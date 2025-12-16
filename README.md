@@ -1,7 +1,8 @@
 # ErosDiffusion — ComfyUI ControlNet Map Cache & Browser
 
-Lightweight helper nodes for generating, tagging, caching, and searching and using ControlNet preprocess maps inside ComfyUI.
-Save resources by skipping already done work!
+Handle your controlnet maps like a pro! Save resources by skipping already done work!
+Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
+
 
 note: this is an **Alpha** stage plugin, if you want to support development feel free to [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
@@ -12,7 +13,7 @@ https://github.com/user-attachments/assets/f7881a43-2fc4-41ca-9655-8090d4b42c64
 
 ## Overview
 
-This package provides two ComfyUI nodes that simplify working with ControlNet maps by caching generated maps to disk and exposing a visual browser:
+This package provides two ComfyUI nodes that simplify working with ControlNet maps by caching generated maps to disk and exposing a visual browser as well as tag them and store references in a local sqlite db:
 
 - `CacheMapNode` — smart cache layer that checks a disk cache before requesting expensive preprocessors and can save generated maps for reuse.
 - `CacheMapBrowserNode` — sidebar/browser integration to preview and load cached maps (returns the selected map).
@@ -20,8 +21,8 @@ This package provides two ComfyUI nodes that simplify working with ControlNet ma
  **note**: there are 2 frontend implementations, please use the LIT one , switch in settings:
  <img width="1087" height="1028" alt="image" src="https://github.com/user-attachments/assets/5b0024ad-8f54-4bdd-b2e9-7b28e82fb36b" />
 
-
 These nodes are designed to reduce repeated preprocessing work and help organize map assets by filename and type.
+Ideally later share and reuse high quality maps in a standard format.
 
 ## Key Features
 
