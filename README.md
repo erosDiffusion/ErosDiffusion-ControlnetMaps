@@ -7,6 +7,8 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 note: this is an **Alpha** stage plugin, if you want to support development feel free to [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
+**important!!! this node does NOT generate the maps**, it helps you organize and use them. to generate the maps you will need other nodes (Aio AUX preprocessor, canny , depth anything or whatever you like!)
+
 ## Installation
 
 1. **Clone** this folder into your ComfyUI `custom_nodes` directory:
