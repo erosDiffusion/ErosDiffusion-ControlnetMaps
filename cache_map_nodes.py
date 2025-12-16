@@ -223,48 +223,48 @@ class CacheMapNode:
             notify_on_complete = set()
             print(f"[CacheMap] Processing 'Generate All' for {filename}...")
             for type_check in self._get_map_types():
-                 if type_check == "custom":
-                     continue
-                 
-                 source_img = kwargs.get(f"source_{type_check}")
-                 if source_img is not None:
-                     # Check if we should save
-                     target_dir, file_paths = self._get_cache_file_paths(cache_path, type_check, filename)
-                     exists = self._check_exists(file_paths)
-                     
-                                 if force_generation or not exists:
-                         if not os.path.exists(target_dir):
+                if type_check == "custom":
+                    continue
+
+                source_img = kwargs.get(f"source_{type_check}")
+                if source_img is not None:
+                    # Check if we should save
+                    target_dir, file_paths = self._get_cache_file_paths(cache_path, type_check, filename)
+                    exists = self._check_exists(file_paths)
+
+                    if force_generation or not exists:
+                        if not os.path.exists(target_dir):
                             os.makedirs(target_dir, exist_ok=True)
-                         save_path = os.path.join(target_dir, os.path.splitext(os.path.basename(filename))[0] + ".png")
-                         
-                         img_tensor = source_img[0]
-                         img_array = (img_tensor * 255.0).cpu().numpy().astype(np.uint8)
-                         img = Image.fromarray(img_array)
-                         img.save(save_path)
-                         print(f"[CacheMap] Generate All: Saved {type_check} -> {save_path}")
+                        save_path = os.path.join(target_dir, os.path.splitext(os.path.basename(filename))[0] + ".png")
 
-                         # Save tags when generating/regenerating; defer frontend notify
-                         save_tags_for_image(filename, tags_str)
-                     else:
-                         print(f"[CacheMap] Generate All: Skipped {type_check} (Exists)")
-                         
-             # Also handle source_original during Generate All
-             orig_img = kwargs.get("source_original")
-                 if orig_img is not None:
-                 target_dir = os.path.join(cache_path, "original")
-                 if not os.path.exists(target_dir):
-                     os.makedirs(target_dir, exist_ok=True)
-                 
-                 save_path = os.path.join(target_dir, os.path.splitext(os.path.basename(filename))[0] + ".png")
-                  if force_generation or not os.path.exists(save_path):
-                      img_tensor = orig_img[0]
-                      img_array = (img_tensor * 255.0).cpu().numpy().astype(np.uint8)
-                      img = Image.fromarray(img_array)
-                      img.save(save_path)
-                      print(f"[CacheMap] Generate All: Saved original -> {save_path}")
+                        img_tensor = source_img[0]
+                        img_array = (img_tensor * 255.0).cpu().numpy().astype(np.uint8)
+                        img = Image.fromarray(img_array)
+                        img.save(save_path)
+                        print(f"[CacheMap] Generate All: Saved {type_check} -> {save_path}")
 
-                      # Save tags for original image (defer notify)
-                      save_tags_for_image(filename, tags_str)
+                        # Save tags when generating/regenerating; defer frontend notify
+                        save_tags_for_image(filename, tags_str)
+                    else:
+                        print(f"[CacheMap] Generate All: Skipped {type_check} (Exists)")
+
+            # Also handle source_original during Generate All
+            orig_img = kwargs.get("source_original")
+            if orig_img is not None:
+                target_dir = os.path.join(cache_path, "original")
+                if not os.path.exists(target_dir):
+                    os.makedirs(target_dir, exist_ok=True)
+
+                save_path = os.path.join(target_dir, os.path.splitext(os.path.basename(filename))[0] + ".png")
+                if force_generation or not os.path.exists(save_path):
+                    img_tensor = orig_img[0]
+                    img_array = (img_tensor * 255.0).cpu().numpy().astype(np.uint8)
+                    img = Image.fromarray(img_array)
+                    img.save(save_path)
+                    print(f"[CacheMap] Generate All: Saved original -> {save_path}")
+
+                    # Save tags for original image (defer notify)
+                    save_tags_for_image(filename, tags_str)
 
         # Process Single Flow (saving source_original if present)
         # We check this every run if connected, to ensure overlay availability
