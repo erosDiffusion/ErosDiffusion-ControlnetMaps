@@ -365,14 +365,20 @@ class CacheMapBrowserNode:
         # filename is relative e.g. "depth/my_file.png"
         
         image_path = None
-        
+
+        # Defensive: if filename is empty or None, return empty tensors
+        if not filename or not str(filename).strip():
+            print(f"[CacheMapBrowser] load_image called with empty filename (cache_path={cache_path})")
+            return (torch.zeros((1, 512, 512, 3)), torch.zeros((1, 512, 512)))
+
         # Check cache_path first
         p1 = os.path.join(cache_path, filename)
-        if os.path.exists(p1):
+        # Ensure we don't treat directories as files
+        if os.path.exists(p1) and os.path.isfile(p1):
             image_path = p1
         elif extra_path:
              p2 = os.path.join(extra_path, filename)
-             if os.path.exists(p2):
+             if os.path.exists(p2) and os.path.isfile(p2):
                  image_path = p2
         
         if image_path is None:
