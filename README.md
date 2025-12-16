@@ -7,6 +7,12 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 note: this is an **Alpha** stage plugin, if you want to support development feel free to [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
+## Installation
+
+1. **Clone** this folder into your ComfyUI `custom_nodes` directory.
+2. Ensure the Python dependencies listed in `requirements.md` are installed (you should need sqlite3 and not much more, but need to refine the requirements.txt yet)
+3. Restart ComfyUI; the nodes appear under the `ErosDiffusion` category or in the templates.
+
 **changelog 22.12.2025 - 17.22**
 
 - There was a tiny initialization issue that would prevent you from opening the map browser if the file reference would be empty. this would be a common scenario for a new installation, and it is now solved.
@@ -73,11 +79,7 @@ depth, canny, openpose, lineart, scribble, softedge, normal, seg, shuffle, media
 You can customize that list in `eros_config.json` (node will read this file on load). (this feature should work but not well tested)
 custom is a passthrough, you can pass whatever you want. original is always meatn to be there, as you need it for overlays. 
 
-## Installation
 
-1. Clone this folder into your ComfyUI `custom_nodes` directory.
-2. Ensure the Python dependencies listed in `requirements.md` are installed (you should need sqlite3 and not much more, but need to refine the requirements.txt yet)
-3. Restart ComfyUI; the nodes appear under the `ErosDiffusion` category or in the templates.
 
 ## Typical Workflows (two workflows preset in the workflow examples folder)
 
