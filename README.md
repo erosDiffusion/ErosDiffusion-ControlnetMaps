@@ -15,7 +15,9 @@ This package provides two ComfyUI nodes that simplify working with ControlNet ma
 - `CacheMapNode` — smart cache layer that checks a disk cache before requesting expensive preprocessors and can save generated maps for reuse.
 - `CacheMapBrowserNode` — sidebar/browser integration to preview and load cached maps (returns the selected map).
 
-  
+ **note**: there are 2 frontend implementations, please use the LIT one , switch in settings:
+ <img width="1087" height="1028" alt="image" src="https://github.com/user-attachments/assets/5b0024ad-8f54-4bdd-b2e9-7b28e82fb36b" />
+
 
 These nodes are designed to reduce repeated preprocessing work and help organize map assets by filename and type.
 
