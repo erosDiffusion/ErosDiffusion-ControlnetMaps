@@ -78,22 +78,27 @@ app.registerExtension({
           if (sidebar) {
             try {
               const id = this.drawer._sidebarId || "eros-cache-browser";
-              if (typeof sidebar.openTab === "function") {
-                sidebar.openTab(id);
-                return;
-              } else if (typeof sidebar.open === "function") {
-                sidebar.open(id);
-                return;
-              } else if (typeof sidebar.showTab === "function") {
-                sidebar.showTab(id);
-                return;
-              } else if (typeof sidebar.activateTab === "function") {
-                sidebar.activateTab(id);
-                return;
-              } else if (typeof sidebar.show === "function") {
-                sidebar.show(id);
-                return;
-              }
+                if (typeof sidebar.openTab === "function") {
+                  sidebar.openTab(id);
+                  try { this.drawer.open(this); } catch(e) {}
+                  return;
+                } else if (typeof sidebar.open === "function") {
+                  sidebar.open(id);
+                  try { this.drawer.open(this); } catch(e) {}
+                  return;
+                } else if (typeof sidebar.showTab === "function") {
+                  sidebar.showTab(id);
+                  try { this.drawer.open(this); } catch(e) {}
+                  return;
+                } else if (typeof sidebar.activateTab === "function") {
+                  sidebar.activateTab(id);
+                  try { this.drawer.open(this); } catch(e) {}
+                  return;
+                } else if (typeof sidebar.show === "function") {
+                  sidebar.show(id);
+                  try { this.drawer.open(this); } catch(e) {}
+                  return;
+                }
             } catch (e) {
               console.warn("Sidebar open API failed, falling back to component.open:", e);
             }
