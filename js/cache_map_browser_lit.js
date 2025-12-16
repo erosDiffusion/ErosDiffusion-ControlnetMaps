@@ -344,6 +344,9 @@ class ErosLitGrid extends LitElement {
         composed: true,
       })
     );
+    // Do not emit a global event; let the parent `ErosLitBrowser` handle
+    // selection and update the active node directly. This prevents
+    // multiple nodes from being updated when an image is selected.
     // Local selection highlight?
     // const items = this.shadowRoot.querySelectorAll('.eros-item');
     // items.forEach(i => i.classList.remove('selected'));
@@ -381,22 +384,63 @@ class ErosLitSidebar extends LitElement {
     selectedTags: { type: Object }, // Set or null
     tagSearchQuery: { type: String },
     hasSelection: { type: Boolean },
+    selectedFilename: { type: String },
+    activeNode: { type: Object },
   };
 
   constructor() {
     super();
     this.activeFilters = new Set();
     this.collapsed = { filter: false, selected: false };
+    this._activeNode = null;
+    this._activeFilename = null;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    // Listen for nodes opening the browser so we can highlight/link
+    this._onBrowserOpen = (ev) => {
+      try {
+        const node = ev?.detail?.node;
+        this._activeNode = node || null;
+        this._activeFilename =
+          node?.widgets?.find((w) => w.name === "filename")?.value || null;
+        this.requestUpdate();
+      } catch (e) {}
+    };
+    window.addEventListener("eros.cache.browser.open", this._onBrowserOpen);
+    // Fetch files so the sidebar shows content even when opened manually
+    try {
+      this.fetchFiles(false);
+    } catch (e) {}
+  }
+
+  disconnectedCallback() {
+    try {
+      if (this._onBrowserOpen)
+        window.removeEventListener("eros.cache.browser.open", this._onBrowserOpen);
+    } catch (e) {}
+    super.disconnectedCallback();
   }
 
   render() {
     const query = (this.tagSearchQuery || "").toLowerCase();
+
+    // Prefer property-based linkage when available
+    const linkedName = this.selectedFilename || (this.activeNode && this.activeNode.widgets?.find((w)=>w.name==="filename")?.value) || null;
 
     return html`
       <style>
         ${DRAWER_CSS}
       </style>
       <div class="eros-tag-sidebar">
+        ${linkedName
+          ? html`<div
+              style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
+            >
+              Linked: ${linkedName}
+            </div>`
+          : html`<div style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;">No node linked — open a node and click "Open Browser" to link</div>`}
         <!-- Filter Section -->
         <div class="eros-tag-section">
           <div
@@ -628,6 +672,12 @@ export class ErosLitBrowser extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.cache.setCachePath(this.dataset.cachePath || ""); // Passed from parent via attribute?
+    console.log(
+      "[Lit] connectedCallback; dataset.cachePath=",
+      this.dataset.cachePath,
+      "_sidebarMethod=",
+      this._sidebarMethod
+    );
     this.cache.loadTags();
   }
 
@@ -828,9 +878,14 @@ export class ErosLitBrowser extends LitElement {
 
         <div class="eros-drawer-header">
           <div style="display:flex;align-items:center;gap:10px;">
-            <h3>Cache Browser
+            <h3>
+              Cache Browser
               ${this.activeNode
-                ? html` — Node: ${this.activeNode.id || this.activeNode.uid || this.activeNode.name || "(unknown)"}`
+                ? html` — Node:
+                  ${this.activeNode.id ||
+                  this.activeNode.uid ||
+                  this.activeNode.name ||
+                  "(unknown)"}`
                 : ""}
             </h3>
             <button
@@ -873,6 +928,8 @@ export class ErosLitBrowser extends LitElement {
             .selectedTags=${selectedTags ? new Set(selectedTags) : null}
             .tagSearchQuery=${this.tagSearchQuery}
             .hasSelection=${!!this.selectedFilename}
+            .selectedFilename=${this.selectedFilename}
+            .activeNode=${this.activeNode}
             @filter-search=${(e) => {
               this.tagSearchQuery = e.detail;
             }}
@@ -923,6 +980,17 @@ export class ErosLitBrowser extends LitElement {
     this.saveSettings();
   }
   _handleTab(e) {
+    const tab = e.detail;
+    this.currentTab = tab;
+    this.settings = { ...this.settings, currentTab: tab };
+    // Refresh file list for the newly selected tab
+    try {
+      this.fetchFiles(tab);
+    } catch (ex) {
+      // ignore
+    }
+  }
+
   setActiveNode(node) {
     // Assign active node and sync cache path + initial selection
     this.activeNode = node;
@@ -962,9 +1030,24 @@ export class ErosLitBrowser extends LitElement {
   }
 
   open(node) {
-    console.log("[Lit] Opening for node:", node);
+    console.log(
+      "[Lit] Opening for node:",
+      node,
+      "_sidebarMethod=",
+      this._sidebarMethod,
+      "_sidebarId=",
+      this._sidebarId
+    );
     // Ensure active node is set first so header and state update
     if (node) this.setActiveNode(node);
     this.isOpen = true;
     this.fetchFiles(false);
   }
+}
+
+// Register the main browser element
+try {
+  customElements.define("eros-lit-browser", ErosLitBrowser);
+} catch (ex) {
+  // ignore if already defined
+}

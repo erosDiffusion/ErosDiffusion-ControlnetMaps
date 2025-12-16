@@ -7,9 +7,8 @@
 const STYLE_ID = "eros-cache-browser-style";
 export const DRAWER_CSS = `
 .eros-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
+    
+    
     width: 960px; /* 2x larger default */
     height: 100vh;
     background: rgba(20, 20, 24, 0.98);
@@ -22,12 +21,13 @@ export const DRAWER_CSS = `
     box-shadow: -5px 0 15px rgba(0,0,0,0.5);
     color: white;
     font-family: sans-serif;
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
+    
+    
     min-width: 400px;
 }
+.eros-drawer-resize-handle { display: block; }
+
 .eros-drawer.open {
-    transform: translateX(0);
 }
 .eros-drawer-resize-handle {
     position: absolute;
