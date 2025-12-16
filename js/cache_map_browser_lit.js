@@ -828,7 +828,11 @@ export class ErosLitBrowser extends LitElement {
 
         <div class="eros-drawer-header">
           <div style="display:flex;align-items:center;gap:10px;">
-            <h3>Cache Browser</h3>
+            <h3>Cache Browser
+              ${this.activeNode
+                ? html` — Node: ${this.activeNode.id || this.activeNode.uid || this.activeNode.name || "(unknown)"}`
+                : ""}
+            </h3>
             <button
               class="eros-btn-small"
               style="font-size:12px;padding:2px 8px;"
@@ -919,10 +923,48 @@ export class ErosLitBrowser extends LitElement {
     this.saveSettings();
   }
   _handleTab(e) {
-    this.currentTab = e.detail.tab;
-    this.settings = { ...this.settings, currentTab: e.detail.tab };
-    this.saveSettings();
-    this.fetchFiles(true); // Propagate selection update to node
+  setActiveNode(node) {
+    // Assign active node and sync cache path + initial selection
+    this.activeNode = node;
+    this.cache.setCachePath(
+      node?.widgets?.find((w) => w.name === "cache_path")?.value || ""
+    );
+
+    if (node) {
+      const wVal = node.widgets?.find((w) => w.name === "filename")?.value;
+      if (wVal) {
+        const parts = wVal.split("/");
+        if (parts.length > 1) {
+          const tab = parts[0];
+          if (
+            [
+              "depth",
+              "canny",
+              "pose",
+              "segmentation",
+              "lineart",
+              "openpose",
+              "scribble",
+              "softedge",
+              "original",
+            ].includes(tab)
+          ) {
+            this.currentTab = tab;
+            this.settings = { ...this.settings, currentTab: tab };
+          }
+          this.selectedFilename = parts[1];
+        } else {
+          this.selectedFilename = wVal;
+        }
+      }
+    }
+    this.requestUpdate();
   }
-}
-customElements.define("eros-lit-browser", ErosLitBrowser);
+
+  open(node) {
+    console.log("[Lit] Opening for node:", node);
+    // Ensure active node is set first so header and state update
+    if (node) this.setActiveNode(node);
+    this.isOpen = true;
+    this.fetchFiles(false);
+  }
