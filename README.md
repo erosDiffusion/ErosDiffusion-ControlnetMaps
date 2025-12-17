@@ -108,6 +108,9 @@ You also find them in the ComfyUI templates sidebar
 - filter using tags
 - import is non destructive but additive (adds missing tags and images so feel free to import on top of what you have)
 
+## Known Issues
+
+- preview does not show in ControlnetMapBrowser node, when using nodes 2.0...if you want to see the preview in the node use the older gui, tested in comfyui v0.4. 
 
 ## Troubleshooting
 
