@@ -664,7 +664,9 @@ class ErosLitSidebar extends LitElement {
     if (parts.length === 0) return;
 
     const existingLower = new Set(
-      Array.from(this.selectedTags || []).map((t) => (t ?? "").toString().toLowerCase())
+      Array.from(this.selectedTags || []).map((t) =>
+        (t ?? "").toString().toLowerCase()
+      )
     );
     const seenLower = new Set();
 
