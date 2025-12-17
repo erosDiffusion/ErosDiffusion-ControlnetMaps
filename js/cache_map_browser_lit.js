@@ -1079,11 +1079,20 @@ export class ErosLitBrowser extends LitElement {
               Run ▶
             </button>
           </div>
-            <!-- close button removed: sidebar icon handles toggling -->
-          </div>
-          ${linkedName
-            ? html`<div style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;">Linked: ${linkedName}</div>`
-            : html`<div style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;">No node linked — open a node and click "Open/Connect to Map browser" to link</div>`}
+          <!-- close button removed: sidebar icon handles toggling -->
+        </div>
+        ${linkedName
+          ? html`<div
+              style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
+            >
+              Linked: ${linkedName}
+            </div>`
+          : html`<div
+              style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
+            >
+              No node linked — open a node and click "Open/Connect to Map
+              browser" to link
+            </div>`}
 
         <div class="eros-wc-container">
           <div class="eros-main-column">

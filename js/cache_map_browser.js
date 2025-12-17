@@ -86,6 +86,65 @@ import { app } from "../../scripts/app.js";
 
 app.registerExtension({
   name: "ErosDiffusion.CacheMapBrowser",
+  // About panel badges (appears in ComfyUI Settings -> About)
+  aboutPageBadges: [
+    {
+      label: "Controlnet Map Browser",
+      url: "https://github.com/erosDiffusion/ErosDiffusion-ControlnetMaps",
+      icon: "pi pi-github",
+    },
+    {
+      label: "Donate",
+      url: "https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202",
+      icon: "pi pi-heart",
+    },
+  ],
+  // Selection toolbox commands: adds a button when nodes are selected
+  commands: [
+    {
+      id: "eros-cache.open-connect",
+      label: "Open/Connect Map Browser",
+      icon: "pi pi-folder",
+      function: async (selectedItem) => {
+        try {
+          // Ensure browser element exists
+          let browser = window._eros_cache_browser;
+          if (!browser) {
+            try {
+              await import("./cache_map_browser_lit.js");
+            } catch (e) {}
+            browser = window._eros_cache_browser;
+            if (!browser) {
+              try {
+                browser = document.createElement("eros-lit-browser");
+                window._eros_cache_browser = browser;
+                document.body.appendChild(browser);
+              } catch (e) {}
+            }
+          }
+
+          // Dispatch open event and call open() if available
+          try {
+            window.dispatchEvent(new CustomEvent("eros.cache.browser.open", { detail: { node: selectedItem } }));
+          } catch (e) {}
+          try {
+            if (browser && typeof browser.open === "function") browser.open(selectedItem);
+          } catch (e) {}
+        } catch (e) {
+          console.error("eros-cache: open-connect command failed", e);
+        }
+      },
+    },
+  ],
+  getSelectionToolboxCommands: (selectedItem) => {
+    try {
+      const selectedItems = app.canvas.selectedItems;
+      const itemCount = selectedItems ? selectedItems.size : 0;
+      // Show when exactly one node is selected
+      if (itemCount === 1) return ["eros-cache.open-connect"];
+    } catch (e) {}
+    return [];
+  },
   async beforeRegisterNodeDef(nodeType, nodeData) {
     if (nodeData.name === "CacheMapBrowserNode") {
       // Helper to load and create the lit drawer (simple: create the element and append to body)
