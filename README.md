@@ -115,19 +115,19 @@ You also find them in the ComfyUI templates sidebar
 - For `auto` mode misses, ensure the corresponding `source_<type>` input is connected so the preprocessor can run and generate the map.
 - If browser doesn't show files, confirm the UI has access to the configured `cache_path` and any `extra_path` you provided.
 
-## Roadmap
+## Further Roadmap
+- [x] Provide downloadable starter import .zip
 - [ ] Integrate with ComfyUI Registry
-- [ ] Provide downloadable starter import .zip
 - [ ] Test and Optimize for large number of images
 - [ ] Implement automatic tagging
 - [ ] Implement automatic map generation (we'll see, AIO there's plugins for that)
 
 ## Contributing
 
-PRs welcome. Keep changes focused and add tests/examples where possible. Test it and tell me what's wrong.
-during the vanilla to lit porting something got off, so there are some regressions.
+- PRs welcome. Keep changes focused and add tests/examples where possible. Test it and tell me what's wrong.
 
 ## Supporting
+
 If you feel like rich:  [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
 
