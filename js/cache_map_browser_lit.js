@@ -260,7 +260,16 @@ class ErosLitGrid extends LitElement {
         }
         .eros-grid {
           grid-template-columns: repeat(${cols}, 1fr);
+
           --badge-font-size: ${badgeSize}px;
+
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE 10+ */
+        }
+        .eros-grid::-webkit-scrollbar {
+          width: 0;
+          height: 0;
+          display: none;
         }
       </style>
       <div class="eros-grid">
@@ -978,6 +987,17 @@ export class ErosLitBrowser extends LitElement {
           height: 100%;
           overflow: hidden;
           width: 100%;
+        }
+        :host {
+          max-height: 100%;
+          width: 100%;
+          display: block;
+          box-sizing: border-box;
+        }
+        .eros-drawer {
+          max-height: 100%;
+          width: 100%;
+          box-sizing: border-box;
         }
         .eros-main-column {
           display: flex;
