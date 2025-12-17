@@ -330,6 +330,7 @@ class ErosLitGrid extends LitElement {
                 )}&subfolder=original&filename=${encodeURIComponent(
                   filename
                 )}${ts}"
+                loading="lazy"
                 style="opacity:${c.opacity}; mix-blend-mode:${c.blendMode}; position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"
                 @error=${(e) => (e.target.style.display = "none")}
               />
@@ -470,18 +471,6 @@ class ErosLitSidebar extends LitElement {
         ${DRAWER_CSS}
       </style>
       <div class="eros-tag-sidebar">
-        ${linkedName
-          ? html`<div
-              style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
-            >
-              Linked: ${linkedName}
-            </div>`
-          : html`<div
-              style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
-            >
-              No node linked — open a node and click "Open/Connect to Map
-              browser" to link
-            </div>`}
         <!-- Filter Section -->
         <div class="eros-tag-section">
           <div
@@ -1021,6 +1010,12 @@ export class ErosLitBrowser extends LitElement {
       ? this.cache.imageTags.get(this.cache.getBasename(this.selectedFilename))
       : null;
 
+    const linkedName =
+      this.selectedFilename ||
+      (this.activeNode &&
+        this.activeNode.widgets?.find((w) => w.name === "filename")?.value) ||
+      null;
+
     return html`
       <style>
         ${DRAWER_CSS} ${BTN_CSS} .eros-wc-container {
@@ -1084,8 +1079,11 @@ export class ErosLitBrowser extends LitElement {
               Run ▶
             </button>
           </div>
-          <!-- close button removed: sidebar icon handles toggling -->
-        </div>
+            <!-- close button removed: sidebar icon handles toggling -->
+          </div>
+          ${linkedName
+            ? html`<div style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;">Linked: ${linkedName}</div>`
+            : html`<div style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;">No node linked — open a node and click "Open/Connect to Map browser" to link</div>`}
 
         <div class="eros-wc-container">
           <div class="eros-main-column">
