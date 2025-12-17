@@ -48,7 +48,9 @@ class CacheMapNode:
         default_path = os.path.join(folder_paths.get_input_directory(), "maps")
         input_config = {
             "required": {
-                "cache_path": ("STRING", {"default": default_path, "tooltip": "Root directory for the cache. Maps will be stored/read from subfolders by type (e.g. cache_path/depth/filename.png)."}),
+                # Start with an empty default so the node uses the internal
+                # `default_maps_dir` when `cache_path` is left blank by the user.
+                "cache_path": ("STRING", {"default": "", "tooltip": "Root directory for the cache. Leave empty to use the Comfy input/maps folder."}),
                 "filename": ("STRING", {"forceInput": True, "tooltip": "The unique identifier (base filename) for the map. Use 'Load Image ErosDiffusion' to extract this from a source image."}),
                 "map_type": (["auto"] + load_map_types() + ["browser"], {"default": "auto", "tooltip": "The type of map to handle. 'browser' is a pure pass-through."}),
                 "save_if_new": ("BOOLEAN", {"default": True, "tooltip": "If True, saves the generated map to the cache directory if it wasn't found."}),
@@ -391,7 +393,9 @@ class CacheMapBrowserNode:
         default_path = os.path.join(folder_paths.get_input_directory(), "maps")
         return {
             "required": {
-                "cache_path": ("STRING", {"default": default_path, "tooltip": "Root directory for the cache."}),
+                # Use empty default so the browser node also falls back to the
+                # internal default maps directory when nothing is entered.
+                "cache_path": ("STRING", {"default": "", "tooltip": "Root directory for the cache. Leave empty to use the Comfy input/maps folder."}),
             },
             "optional": {
                 "extra_path": ("STRING", {"default": "", "tooltip": "Additional path to browse."}),
