@@ -37,6 +37,22 @@ const sharedStyles = css`
   /* We inject the global drawer CSS here for components that need it */
 `;
 
+// Centralized list of map types / tabs (should match node's map types)
+const MAP_TABS = [
+  "original",
+  "depth",
+  "canny",
+  "openpose",
+  "lineart",
+  "scribble",
+  "softedge",
+  "normal",
+  "seg",
+  "shuffle",
+  "mediapipe_face",
+  "custom",
+];
+
 // ========================================================
 // Lit Browser Controls
 // ========================================================
@@ -75,17 +91,7 @@ class ErosLitControls extends LitElement {
       </style>
       <div class="eros-controls">
         <div class="eros-tabs">
-          ${[
-            "original",
-            "depth",
-            "canny",
-            "pose",
-            "segmentation",
-            "lineart",
-            "openpose",
-            "scribble",
-            "softedge",
-          ].map(
+          ${MAP_TABS.map(
             (t) => html`
               <div
                 class="eros-tab ${t === c.currentTab ? "active" : ""}"
@@ -772,19 +778,7 @@ export class ErosLitBrowser extends LitElement {
         const parts = wVal.split("/");
         if (parts.length > 1) {
           const tab = parts[0];
-          if (
-            [
-              "depth",
-              "canny",
-              "pose",
-              "segmentation",
-              "lineart",
-              "openpose",
-              "scribble",
-              "softedge",
-              "original",
-            ].includes(tab)
-          ) {
+          if (MAP_TABS.includes(tab)) {
             this.currentTab = tab;
             this.settings = { ...this.settings, currentTab: tab };
           }
@@ -1198,19 +1192,7 @@ export class ErosLitBrowser extends LitElement {
         const parts = wVal.split("/");
         if (parts.length > 1) {
           const tab = parts[0];
-          if (
-            [
-              "depth",
-              "canny",
-              "pose",
-              "segmentation",
-              "lineart",
-              "openpose",
-              "scribble",
-              "softedge",
-              "original",
-            ].includes(tab)
-          ) {
+          if (MAP_TABS.includes(tab)) {
             this.currentTab = tab;
             this.settings = { ...this.settings, currentTab: tab };
           }
