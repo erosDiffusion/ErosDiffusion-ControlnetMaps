@@ -134,95 +134,100 @@ app.registerExtension({
           ? onNodeCreated.apply(this, arguments)
           : undefined;
 
-        this.addWidget("button", "Open/Connect to Map browser", "open", async () => {
-          if (!this.drawer) this.drawer = await getDrawer();
-          if (!this.drawer) return;
+        this.addWidget(
+          "button",
+          "Open/Connect to Map browser",
+          "open",
+          async () => {
+            if (!this.drawer) this.drawer = await getDrawer();
+            if (!this.drawer) return;
 
-          // If the component was registered with the sidebar/extensionManager, try to open/show it via sidebar APIs
-          const sidebar =
-            this.drawer._sidebar || app?.ui?.sidebar || app?.extensionManager;
-          console.log(
-            "[CacheMapBrowser] attempting to open sidebar. sidebar present:",
-            !!sidebar,
-            "drawer._sidebarMethod:",
-            this.drawer._sidebarMethod,
-            "drawer._sidebarId:",
-            this.drawer._sidebarId
-          );
-          // Broadcast that a node opened the browser so standalone sidebar can react
-          try {
-            window.dispatchEvent(
-              new CustomEvent("eros.cache.browser.open", {
-                detail: { node: this },
-              })
+            // If the component was registered with the sidebar/extensionManager, try to open/show it via sidebar APIs
+            const sidebar =
+              this.drawer._sidebar || app?.ui?.sidebar || app?.extensionManager;
+            console.log(
+              "[CacheMapBrowser] attempting to open sidebar. sidebar present:",
+              !!sidebar,
+              "drawer._sidebarMethod:",
+              this.drawer._sidebarMethod,
+              "drawer._sidebarId:",
+              this.drawer._sidebarId
             );
-          } catch (e) {}
-          if (sidebar) {
+            // Broadcast that a node opened the browser so standalone sidebar can react
             try {
-              const id = this.drawer._sidebarId || "eros-cache-sidebar";
-              if (typeof sidebar.openTab === "function") {
+              window.dispatchEvent(
+                new CustomEvent("eros.cache.browser.open", {
+                  detail: { node: this },
+                })
+              );
+            } catch (e) {}
+            if (sidebar) {
+              try {
+                const id = this.drawer._sidebarId || "eros-cache-sidebar";
+                if (typeof sidebar.openTab === "function") {
+                  console.log(
+                    "[CacheMapBrowser] calling sidebar.openTab(%s)",
+                    id
+                  );
+                  sidebar.openTab(id);
+                  try {
+                    this.drawer.open(this);
+                  } catch (e) {}
+                  return;
+                } else if (typeof sidebar.open === "function") {
+                  console.log("[CacheMapBrowser] calling sidebar.open(%s)", id);
+                  sidebar.open(id);
+                  try {
+                    this.drawer.open(this);
+                  } catch (e) {}
+                  return;
+                } else if (typeof sidebar.showTab === "function") {
+                  console.log(
+                    "[CacheMapBrowser] calling sidebar.showTab(%s)",
+                    id
+                  );
+                  sidebar.showTab(id);
+                  try {
+                    this.drawer.open(this);
+                  } catch (e) {}
+                  return;
+                } else if (typeof sidebar.activateTab === "function") {
+                  console.log(
+                    "[CacheMapBrowser] calling sidebar.activateTab(%s)",
+                    id
+                  );
+                  sidebar.activateTab(id);
+                  try {
+                    this.drawer.open(this);
+                  } catch (e) {}
+                  return;
+                } else if (typeof sidebar.show === "function") {
+                  console.log("[CacheMapBrowser] calling sidebar.show(%s)", id);
+                  sidebar.show(id);
+                  try {
+                    this.drawer.open(this);
+                  } catch (e) {}
+                  return;
+                }
                 console.log(
-                  "[CacheMapBrowser] calling sidebar.openTab(%s)",
-                  id
+                  "[CacheMapBrowser] sidebar found but no known open method matched, will fallback to component.open"
                 );
-                sidebar.openTab(id);
-                try {
-                  this.drawer.open(this);
-                } catch (e) {}
-                return;
-              } else if (typeof sidebar.open === "function") {
-                console.log("[CacheMapBrowser] calling sidebar.open(%s)", id);
-                sidebar.open(id);
-                try {
-                  this.drawer.open(this);
-                } catch (e) {}
-                return;
-              } else if (typeof sidebar.showTab === "function") {
-                console.log(
-                  "[CacheMapBrowser] calling sidebar.showTab(%s)",
-                  id
+              } catch (e) {
+                console.warn(
+                  "[CacheMapBrowser] Sidebar open API failed, falling back to component.open:",
+                  e
                 );
-                sidebar.showTab(id);
-                try {
-                  this.drawer.open(this);
-                } catch (e) {}
-                return;
-              } else if (typeof sidebar.activateTab === "function") {
-                console.log(
-                  "[CacheMapBrowser] calling sidebar.activateTab(%s)",
-                  id
-                );
-                sidebar.activateTab(id);
-                try {
-                  this.drawer.open(this);
-                } catch (e) {}
-                return;
-              } else if (typeof sidebar.show === "function") {
-                console.log("[CacheMapBrowser] calling sidebar.show(%s)", id);
-                sidebar.show(id);
-                try {
-                  this.drawer.open(this);
-                } catch (e) {}
-                return;
               }
-              console.log(
-                "[CacheMapBrowser] sidebar found but no known open method matched, will fallback to component.open"
-              );
-            } catch (e) {
-              console.warn(
-                "[CacheMapBrowser] Sidebar open API failed, falling back to component.open:",
-                e
-              );
             }
+
+            // Fallback: call the component's open method
+            if (typeof this.drawer.open === "function") this.drawer.open(this);
+
+            // The browser instance updates the active (linked) node directly
+            // when an image is selected. No global selection listeners are
+            // required on the node side.
           }
-
-          // Fallback: call the component's open method
-          if (typeof this.drawer.open === "function") this.drawer.open(this);
-
-          // The browser instance updates the active (linked) node directly
-          // when an image is selected. No global selection listeners are
-          // required on the node side.
-        });
+        );
 
         this.addWidget("button", "Run", "run", () => {
           app.queuePrompt(0, 1);

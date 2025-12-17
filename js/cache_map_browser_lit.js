@@ -470,7 +470,7 @@ class ErosLitSidebar extends LitElement {
         ${DRAWER_CSS}
       </style>
       <div class="eros-tag-sidebar">
-          ${linkedName
+        ${linkedName
           ? html`<div
               style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
             >
@@ -479,7 +479,8 @@ class ErosLitSidebar extends LitElement {
           : html`<div
               style="font-size:12px;color:#9ca2ad;padding:6px 0;border-bottom:1px solid #333;"
             >
-              No node linked — open a node and click "Open/Connect to Map browser" to link
+              No node linked — open a node and click "Open/Connect to Map
+              browser" to link
             </div>`}
         <!-- Filter Section -->
         <div class="eros-tag-section">
