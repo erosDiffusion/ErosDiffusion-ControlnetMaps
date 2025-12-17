@@ -4,30 +4,6 @@
  * Year: 2025
  */
 
-// Ensure ComfyUI websocket messages for `eros.*` are forwarded to window
-// as DOM CustomEvents. Register early (module load) so listeners exist
-// before an execution run starts and messages aren't reported as unknown.
-try {
-  if (window.api && typeof api.addEventListener === "function") {
-    const forward = (type) => {
-      try {
-        api.addEventListener(type, (ev) => {
-          try {
-            const payload = (ev && (ev.data || ev.detail)) || ev;
-            window.dispatchEvent(new CustomEvent(type, { detail: payload }));
-          } catch (e) {}
-        });
-      } catch (e) {}
-    };
-    [
-      "eros.tags.updated",
-      "eros.image.deleted",
-      "eros.map.saved",
-      "eros.image.saved",
-    ].forEach(forward);
-  }
-} catch (e) {}
-
 import { app } from "../../scripts/app.js";
 import {
   html,
@@ -77,12 +53,9 @@ const MAP_TABS = [
   "custom",
 ];
 
-// ========================================================
-// Lit Browser Controls
-// ========================================================
 class ErosLitControls extends LitElement {
   static properties = {
-    config: { type: Object }, // Input config
+    config: { type: Object },
   };
 
   constructor() {

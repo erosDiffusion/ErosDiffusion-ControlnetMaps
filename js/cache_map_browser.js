@@ -5,7 +5,40 @@
  */
 
 import { app } from "../../scripts/app.js";
+import { api } from "../../scripts/api.js";
 // Simplified: always use the Lit implementation and remove preference switch.
+
+// ComfyUI comms bridge (server -> frontend)
+// Register once at module load so `PromptServer.instance.send_sync("eros.*", ...)`
+// messages are handled even if the sidebar UI has not been opened yet.
+(function initErosCommsBridge() {
+  try {
+    if (window.__eros_comms_bridge_initialized) return;
+    window.__eros_comms_bridge_initialized = true;
+
+    if (!api || typeof api.addEventListener !== "function") return;
+
+    const forward = (type) => {
+      try {
+        api.addEventListener(type, (ev) => {
+          try {
+            const payload = (ev && (ev.detail || ev.data)) || ev;
+            window.dispatchEvent(new CustomEvent(type, { detail: payload }));
+          } catch (e) {}
+        });
+      } catch (e) {}
+    };
+
+    [
+      "eros.tags.updated",
+      "eros.image.deleted",
+      "eros.map.saved",
+      "eros.image.saved",
+    ].forEach(forward);
+  } catch (e) {
+    // ignore
+  }
+})();
 
 // Register the persistent sidebar tab at module load so it's independent
 // from node registration. This makes the sidebar a standalone component
