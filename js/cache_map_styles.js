@@ -5,7 +5,7 @@
  */
 
 const STYLE_ID = "eros-cache-browser-style";
-export const DRAWER_CSS = css`
+export const DRAWER_CSS = `
   .eros-drawer {
     width: 960px; /* 2x larger default */
     height: 100vh;

@@ -701,6 +701,8 @@ export class ErosLitBrowser extends LitElement {
     this.activeFilters = new Set();
     this.settings = {};
     this.isOpen = false;
+    this._patchedContainer = null;
+    this._originalContainerStyle = null;
 
     // Load settings
     const defaults = {
@@ -764,6 +766,72 @@ export class ErosLitBrowser extends LitElement {
     if (!this.currentTab) this.currentTab = "original";
     try {
       this.fetchFiles(false);
+    } catch (e) {}
+    // attempt to apply parent container fix so sidebar fits nicely
+    try {
+      this._applyContainerFix();
+    } catch (e) {}
+  }
+
+  disconnectedCallback() {
+    try {
+      this._removeContainerFix();
+    } catch (e) {}
+    try {
+      super.disconnectedCallback();
+    } catch (e) {}
+  }
+
+  _applyContainerFix() {
+    // Walk up the DOM tree to find a parent element that likely represents
+    // the surrounding sidebar container with zero padding and apply styles.
+    try {
+      let el = this.parentElement || this.host || this;
+      let levels = 8;
+      while (el && levels-- > 0) {
+        if (!(el instanceof HTMLElement)) {
+          el = el.parentElement;
+          continue;
+        }
+        const cs = window.getComputedStyle(el);
+        if (!cs) {
+          el = el.parentElement;
+          continue;
+        }
+        // Match elements with zero padding (likely the wrapper)
+        if (
+          cs.padding === "0px" ||
+          (cs.paddingTop === "0px" && cs.paddingBottom === "0px")
+        ) {
+          // store original inline styles so we can restore them later
+          this._patchedContainer = el;
+          this._originalContainerStyle = {
+            height: el.style.height || "",
+            overflow: el.style.overflow || "",
+          };
+          try {
+            el.style.height = "-webkit-fill-available";
+            el.style.overflow = "hidden";
+          } catch (e) {}
+          break;
+        }
+        el = el.parentElement;
+      }
+    } catch (e) {}
+  }
+
+  _removeContainerFix() {
+    try {
+      if (this._patchedContainer) {
+        const el = this._patchedContainer;
+        const orig = this._originalContainerStyle || {};
+        try {
+          el.style.height = orig.height || "";
+          el.style.overflow = orig.overflow || "";
+        } catch (e) {}
+        this._patchedContainer = null;
+        this._originalContainerStyle = null;
+      }
     } catch (e) {}
   }
 
