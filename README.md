@@ -12,8 +12,8 @@ note: this is an **Alpha** stage plugin, if you want to support development feel
 ## Installation
 
 1. **Clone** this folder into your ComfyUI `custom_nodes` directory:
-   1. `cd <your comfy ui custom_nodes directory>`
-   1. `git clone https://github.com/erosDiffusion/ErosDiffusion-ControlnetMaps.git`  
+   1. `cd <your comfy ui custom_nodes directory>`   
+   1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`  
 2. **Restart ComfyUI**: the nodes appear under the `ErosDiffusion` category or in the templates.
 3. Open Settings->Eros and **switch to "Lit" interface**
 
