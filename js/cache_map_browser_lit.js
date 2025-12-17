@@ -312,7 +312,9 @@ class ErosLitGrid extends LitElement {
                 class="eros-overlay"
                 src="/eros/cache/view_image?path=${encodeURIComponent(
                   this.cachePath
-                )}&subfolder=original&filename=${encodeURIComponent(filename)}${ts}"
+                )}&subfolder=original&filename=${encodeURIComponent(
+                  filename
+                )}${ts}"
                 style="opacity:${c.opacity}; mix-blend-mode:${c.blendMode}; position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"
                 @error=${(e) => (e.target.style.display = "none")}
               />
@@ -602,15 +604,31 @@ class ErosLitSidebar extends LitElement {
                       🤖
                     </button>
                   </div>
-                  <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
-                    <label style="font-size:12px; display:flex; align-items:center; gap:8px;">
-                      <input type="checkbox" id="del-all"
-                        @click=${(e) => { e.stopPropagation(); this._deleteAllFlag = e.target.checked; }}
+                  <div
+                    style="display:flex; flex-direction:column; gap:6px; margin-top:8px;"
+                  >
+                    <label
+                      style="font-size:12px; display:flex; align-items:center; gap:8px;"
+                    >
+                      <input
+                        type="checkbox"
+                        id="del-all"
+                        @click=${(e) => {
+                          e.stopPropagation();
+                          this._deleteAllFlag = e.target.checked;
+                        }}
                       />
                       Delete all maps for original
                     </label>
                     <div>
-                      <button class="eros-btn" style="background:#8b2a2a; color:white;" @click=${(e)=>{ e.stopPropagation(); this._onDelete(); }}>
+                      <button
+                        class="eros-btn"
+                        style="background:#8b2a2a; color:white;"
+                        @click=${(e) => {
+                          e.stopPropagation();
+                          this._onDelete();
+                        }}
+                      >
                         Delete Map
                       </button>
                     </div>
@@ -636,11 +654,13 @@ class ErosLitSidebar extends LitElement {
 
   _onDelete() {
     // Dispatch an event upward so the orchestrator can perform deletion
-    this.dispatchEvent(new CustomEvent("image-delete", {
-      detail: { all: !!this._deleteAllFlag },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("image-delete", {
+        detail: { all: !!this._deleteAllFlag },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 customElements.define("eros-lit-sidebar", ErosLitSidebar);
@@ -887,7 +907,8 @@ export class ErosLitBrowser extends LitElement {
 
     // Load tags for each file entry (strip any prefixed subfolder)
     this.files.forEach((file) => {
-      const name = file && file.includes("/") ? file.split("/").slice(1).join("/") : file;
+      const name =
+        file && file.includes("/") ? file.split("/").slice(1).join("/") : file;
       const base = this.cache.getBasename(name);
       if (!this.cache.imageTags.has(base)) this.cache.loadImageTags(base);
     });
@@ -1076,7 +1097,8 @@ export class ErosLitBrowser extends LitElement {
               )}
             @tag-auto=${() =>
               this.cache.autoTag(this.cache.getBasename(this.selectedFilename))}
-            @image-delete=${(e) => this._handleImageDelete(e.detail && e.detail.all)}
+            @image-delete=${(e) =>
+              this._handleImageDelete(e.detail && e.detail.all)}
           ></eros-lit-sidebar>
         </div>
       </div>
@@ -1122,7 +1144,12 @@ export class ErosLitBrowser extends LitElement {
       if (!ok) return;
     } catch (e) {}
 
-    const res = await this.cache.deleteMap(basename, this.currentTab, this.cache.cachePath, !!allFlag);
+    const res = await this.cache.deleteMap(
+      basename,
+      this.currentTab,
+      this.cache.cachePath,
+      !!allFlag
+    );
     if (res && res.success) {
       // Clear selection and refresh
       this.selectedFilename = null;
