@@ -7,6 +7,7 @@ class MetadataManager:
     """Manages image metadata with schema versioning, favorites, and tags."""
     
     CURRENT_VERSION = 2
+    FAVORITE_TAG = "favorite"
     
     def __init__(self, db_path):
         self.db_path = db_path
@@ -139,6 +140,56 @@ class MetadataManager:
             raise
     
     # ===== Favorites API =====
+
+    def _is_favorite_tag(self, tag_name: str) -> bool:
+        try:
+            return (tag_name or "").strip().lower() == self.FAVORITE_TAG
+        except Exception:
+            return False
+
+    def _set_favorite_row(self, image_path: str, should_be_favorite: bool) -> None:
+        """Ensure favorites table reflects should_be_favorite."""
+        if not image_path:
+            return
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cur = conn.cursor()
+                if should_be_favorite:
+                    cur.execute(
+                        "INSERT OR IGNORE INTO favorites (path, added_at) VALUES (?, ?)",
+                        (image_path, time.time()),
+                    )
+                else:
+                    cur.execute("DELETE FROM favorites WHERE path = ?", (image_path,))
+                conn.commit()
+        except Exception as e:
+            print(f"[MetadataManager] Error setting favorite row: {e}")
+
+    def _set_favorite_tag_assoc(self, image_path: str, should_be_favorite: bool) -> None:
+        """Ensure image_tags contains (or removes) the canonical 'favorite' tag association."""
+        if not image_path:
+            return
+        try:
+            tag_id = self.get_or_create_tag(self.FAVORITE_TAG)
+            if tag_id is None:
+                return
+            with sqlite3.connect(self.db_path) as conn:
+                if should_be_favorite:
+                    conn.execute(
+                        """
+                        INSERT OR IGNORE INTO image_tags (image_path, tag_id, added_at)
+                        VALUES (?, ?, ?)
+                        """,
+                        (image_path, tag_id, time.time()),
+                    )
+                else:
+                    conn.execute(
+                        "DELETE FROM image_tags WHERE image_path = ? AND tag_id = ?",
+                        (image_path, tag_id),
+                    )
+                conn.commit()
+        except Exception as e:
+            print(f"[MetadataManager] Error setting favorite tag assoc: {e}")
     
     def toggle_favorite(self, path):
         """Toggles favorite status. Returns True if now favorite, False if removed."""
@@ -151,11 +202,15 @@ class MetadataManager:
                 if exists:
                     cursor.execute("DELETE FROM favorites WHERE path = ?", (path,))
                     conn.commit()
+                    # Keep tag mirror in sync
+                    self._set_favorite_tag_assoc(path, False)
                     return False
                 else:
                     cursor.execute("INSERT INTO favorites (path, added_at) VALUES (?, ?)", 
                                  (path, time.time()))
                     conn.commit()
+                    # Keep tag mirror in sync
+                    self._set_favorite_tag_assoc(path, True)
                     return True
         except Exception as e:
             print(f"[MetadataManager] Error toggling favorite: {e}")
@@ -221,6 +276,11 @@ class MetadataManager:
     
     def add_tag_to_image(self, image_path, tag_name):
         """Add tag to image."""
+        if self._is_favorite_tag(tag_name):
+            # Canonicalize and mirror to favorites table
+            tag_name = self.FAVORITE_TAG
+            self._set_favorite_row(image_path, True)
+
         tag_id = self.get_or_create_tag(tag_name)
         if tag_id is None:
             return False
@@ -239,9 +299,15 @@ class MetadataManager:
     
     def remove_tag_from_image(self, image_path, tag_name):
         """Remove tag from image."""
+        if self._is_favorite_tag(tag_name):
+            # Always clear favorites table even if the tag row doesn't exist.
+            tag_name = self.FAVORITE_TAG
+            self._set_favorite_row(image_path, False)
+
         tag_id = self.get_tag_id(tag_name)
         if tag_id is None:
-            return False
+            # If the association doesn't exist, we still consider favorite cleared above.
+            return self._is_favorite_tag(tag_name)
         
         try:
             with sqlite3.connect(self.db_path) as conn:
@@ -264,7 +330,18 @@ class MetadataManager:
                     WHERE it.image_path = ?
                     ORDER BY t.name
                 """, (image_path,))
-                return [r[0] for r in cursor.fetchall()]
+                tags = [r[0] for r in cursor.fetchall()]
+
+            # Inject favorites as a special tag (even if only stored in favorites table)
+            try:
+                if self.is_favorite(image_path):
+                    has_fav = any((t or "").strip().lower() == self.FAVORITE_TAG for t in tags)
+                    if not has_fav:
+                        tags = [self.FAVORITE_TAG] + tags
+            except Exception:
+                pass
+
+            return tags
         except Exception as e:
             print(f"[MetadataManager] Error getting tags for image: {e}")
             return []
@@ -274,6 +351,7 @@ class MetadataManager:
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
+
                 cursor.execute("""
                     SELECT t.name, COUNT(it.image_path) as count
                     FROM tags t
@@ -281,7 +359,29 @@ class MetadataManager:
                     GROUP BY t.id, t.name
                     ORDER BY t.name
                 """)
-                return [{"name": r[0], "count": r[1]} for r in cursor.fetchall()]
+                rows = [{"name": r[0], "count": r[1]} for r in cursor.fetchall()]
+
+                # Special handling for favorites: report count as union of favorites table
+                # and any tag associations named 'favorite' (case-insensitive).
+                cursor.execute(
+                    """
+                    SELECT COUNT(DISTINCT p) FROM (
+                        SELECT path as p FROM favorites
+                        UNION
+                        SELECT it.image_path as p
+                        FROM image_tags it
+                        JOIN tags t ON t.id = it.tag_id
+                        WHERE LOWER(t.name) = LOWER(?)
+                    )
+                    """,
+                    (self.FAVORITE_TAG,),
+                )
+                fav_count = cursor.fetchone()[0] or 0
+
+                filtered = [r for r in rows if (r.get("name") or "").strip().lower() != self.FAVORITE_TAG]
+                filtered.append({"name": self.FAVORITE_TAG, "count": fav_count})
+                filtered.sort(key=lambda x: (x.get("name") or "").lower())
+                return filtered
         except Exception as e:
             print(f"[MetadataManager] Error getting all tags: {e}")
             return []

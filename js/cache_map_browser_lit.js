@@ -299,6 +299,7 @@ class ErosLitGrid extends LitElement {
       filename
     )}${ts}`;
     const tags = this.imageTags.get(base);
+    const isFav = this._hasTag(tags, "favorite");
 
     return html`
       <div
@@ -308,6 +309,13 @@ class ErosLitGrid extends LitElement {
           : ""}"
         @click=${() => this.select(f, imgPath)}
       >
+        <div
+          class="eros-star ${isFav ? "active" : ""}"
+          title="Toggle favorite"
+          @click=${(e) => this._toggleFavorite(e, base)}
+        >
+          ${isFav ? "★" : "☆"}
+        </div>
         <div class="eros-loader"></div>
         <img
           src="${imgPath}"
@@ -352,6 +360,34 @@ class ErosLitGrid extends LitElement {
         <div class="eros-item-label">${base}</div>
       </div>
     `;
+  }
+
+  _hasTag(tags, name) {
+    try {
+      if (!tags || !name) return false;
+      const nl = name.toLowerCase();
+      for (const t of tags) {
+        if ((t ?? "").toString().trim().toLowerCase() === nl) return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  _toggleFavorite(e, base) {
+    try {
+      e?.stopPropagation?.();
+      e?.preventDefault?.();
+    } catch (err) {}
+
+    this.dispatchEvent(
+      new CustomEvent("favorite-toggle", {
+        detail: { basename: base },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   select(f, path) {
@@ -1393,6 +1429,26 @@ export class ErosLitBrowser extends LitElement {
               .currentTab=${this.currentTab}
               .config=${this.settings}
               .selectedFilename=${this.selectedFilename}
+              @favorite-toggle=${(e) => {
+                const base = e?.detail?.basename;
+                if (!base) return;
+
+                const tags = this.cache.imageTags.get(base);
+                let isFav = false;
+                try {
+                  if (tags) {
+                    for (const t of tags) {
+                      if ((t ?? "").toString().trim().toLowerCase() === "favorite") {
+                        isFav = true;
+                        break;
+                      }
+                    }
+                  }
+                } catch (err) {}
+
+                if (isFav) this.cache.removeTag(base, "favorite");
+                else this.cache.addTag(base, "favorite");
+              }}
               @image-selected=${(e) => {
                 // Filename may be prefixed with subfolder (type/file.png)
                 const fn = e.detail.filename;
