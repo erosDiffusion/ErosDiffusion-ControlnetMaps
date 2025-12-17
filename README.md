@@ -18,6 +18,15 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
    1. `cd <your comfy ui custom_nodes directory>`   
    1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`  
 2. **Restart ComfyUI**: the nodes appear under the `ErosDiffusion` category or in the templates.
+3. **Optional** open the "ControlNet Maps Browser" sidebar and import this file:
+
+   [eros_maps_export_2025-12-17T22-07-25-112Z.zip](https://github.com/user-attachments/files/24222985/eros_maps_export_2025-12-17T22-07-25-112Z.zip)
+   
+   it contains two pre-generated maps and some tags to play with
+   
+   <img width="866" height="709" alt="image" src="https://github.com/user-attachments/assets/d165f3c4-1545-4e80-8c6f-33ad882ee45d" />
+
+
 
 
 ## Usage (all workflows are accessible from comfyUi templates)
