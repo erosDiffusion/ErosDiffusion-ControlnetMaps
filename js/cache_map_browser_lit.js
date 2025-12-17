@@ -1067,7 +1067,7 @@ export class ErosLitBrowser extends LitElement {
         <div class="eros-drawer-header">
           <div style="display:flex;align-items:center;gap:10px;">
             <h3>
-              Cache Browser
+              Controlnet Map Browser
               ${this.activeNode
                 ? html` — Node:
                   ${this.activeNode.id ||

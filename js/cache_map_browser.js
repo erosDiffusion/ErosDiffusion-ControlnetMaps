@@ -25,8 +25,8 @@ import { app } from "../../scripts/app.js";
         const sidebarCleanup = app.extensionManager.registerSidebarTab({
           id: sid,
           icon: "pi pi-folder",
-          title: "Cache Browser",
-          tooltip: "Cache Browser",
+          title: "Controlnet Map Browser",
+          tooltip: "Controlnet Map Browser",
           type: "custom",
           render: (containerEl) => {
             containerEl.style.padding = "0";
