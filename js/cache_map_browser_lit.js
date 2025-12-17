@@ -654,14 +654,40 @@ class ErosLitSidebar extends LitElement {
   }
 
   _addTag(val, input) {
-    if (!val || !val.trim()) return;
-    this.dispatchEvent(
-      new CustomEvent("tag-add", {
-        detail: val.trim(),
-        bubbles: true,
-        composed: true,
-      })
+    const raw = (val ?? "").toString();
+    if (!raw.trim()) return;
+
+    const parts = raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => !!s);
+    if (parts.length === 0) return;
+
+    const existingLower = new Set(
+      Array.from(this.selectedTags || []).map((t) => (t ?? "").toString().toLowerCase())
     );
+    const seenLower = new Set();
+
+    const toAdd = [];
+    for (const t of parts) {
+      const lower = t.toLowerCase();
+      if (existingLower.has(lower) || seenLower.has(lower)) continue;
+      seenLower.add(lower);
+      toAdd.push(t);
+    }
+
+    if (toAdd.length === 0) return;
+
+    for (const t of toAdd) {
+      this.dispatchEvent(
+        new CustomEvent("tag-add", {
+          detail: t,
+          bubbles: true,
+          composed: true,
+        })
+      );
+    }
+
     if (input) input.value = "";
   }
 

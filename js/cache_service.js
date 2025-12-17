@@ -83,15 +83,27 @@ export class CacheService {
 
   async addTag(basename, tag) {
     if (!basename) return;
-    // Optimistic
+    const normalized = (tag ?? "").toString().trim();
+    if (!normalized) return;
+
     if (!this.imageTags.has(basename)) this.imageTags.set(basename, new Set());
-    this.imageTags.get(basename).add(tag);
-    this.notify("tag-added", { basename, tag });
+    const existing = this.imageTags.get(basename);
+    // De-dupe case-insensitively, preserve existing casing
+    try {
+      const nl = normalized.toLowerCase();
+      for (const t of existing) {
+        if ((t ?? "").toString().toLowerCase() === nl) return;
+      }
+    } catch {}
+
+    // Optimistic
+    existing.add(normalized);
+    this.notify("tag-added", { basename, tag: normalized });
 
     try {
       await api.fetchApi("/eros/tags/add_to_image", {
         method: "POST",
-        body: JSON.stringify({ path: basename, tag: tag }),
+        body: JSON.stringify({ path: basename, tag: normalized }),
       });
     } catch (e) {
       console.error("Add Tag Failed:", e);
