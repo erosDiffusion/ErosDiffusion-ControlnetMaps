@@ -696,6 +696,7 @@ export class ErosLitBrowser extends LitElement {
     super();
     this.cache = new CacheService();
     this.files = [];
+    this._filesByTab = new Map(); // tab -> [filenames]
     this.activeFilters = new Set();
     this.settings = {};
     this.isOpen = false;
@@ -980,6 +981,7 @@ export class ErosLitBrowser extends LitElement {
     // all known map types so the user sees all maps. Otherwise fetch for
     // the currentTab only.
     const MAP_TYPES = [
+      "original",
       "depth",
       "canny",
       "openpose",
@@ -995,36 +997,28 @@ export class ErosLitBrowser extends LitElement {
 
     let combined = [];
     try {
-      if (!this.cache.cachePath && !forceAll) {
-        // If no cachePath and user selected a specific tab, fetch that tab
-        if (this.currentTab) {
-          const f = await this.cache.fetchFiles(this.currentTab);
-          combined = f.map((p) => `${this.currentTab}/${p}`);
-        } else {
-          // No tab selected: fetch all types
-          for (const t of MAP_TYPES) {
-            try {
-              const parts = await this.cache.fetchFiles(t);
-              if (parts && parts.length)
-                combined.push(...parts.map((p) => `${t}/${p}`));
-            } catch (e) {
-              /* ignore per-type failures */
-            }
-          }
-        }
-      } else if (!this.cache.cachePath && forceAll) {
+      // When forceAll is true we refresh all tabs into `_filesByTab`.
+      if (forceAll) {
         for (const t of MAP_TYPES) {
           try {
             const parts = await this.cache.fetchFiles(t);
-            if (parts && parts.length)
-              combined.push(...parts.map((p) => `${t}/${p}`));
+            this._filesByTab.set(t, parts || []);
           } catch (e) {
-            /* ignore per-type failures */
+            this._filesByTab.set(t, []);
           }
         }
+
+        // Always keep the visible grid scoped to the currently selected tab.
+        // This preserves the user's "type" + tag filter expectations.
+        const tab = this.currentTab || "original";
+        const parts = this._filesByTab.get(tab) || [];
+        combined = parts.map((p) => `${tab}/${p}`);
       } else {
-        const f = await this.cache.fetchFiles(this.currentTab);
-        combined = f.map((p) => `${this.currentTab}/${p}`);
+        // Normal refresh: only load current tab.
+        const tab = this.currentTab || "original";
+        const f = await this.cache.fetchFiles(tab);
+        this._filesByTab.set(tab, f || []);
+        combined = (f || []).map((p) => `${tab}/${p}`);
       }
     } catch (e) {
       combined = [];
