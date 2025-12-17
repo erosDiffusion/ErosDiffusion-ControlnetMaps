@@ -1029,7 +1029,7 @@ export class ErosLitBrowser extends LitElement {
           width: 100%;
         }
         :host {
-          max-height: 100%;
+          height: 100%;
           width: 100%;
           display: block;
           box-sizing: border-box;
