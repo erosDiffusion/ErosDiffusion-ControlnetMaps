@@ -17,7 +17,7 @@
     *   **Generate All**: Batch process all connected inputs and source original image in one go.
     *   **Lazy Input**: Use `LazyInput` for source connections to prevent unnecessary upstream execution when cache hits.
 *   **Visual Map Browser (`CacheMapBrowserNode`)**:
-    *   **Interactive UI**: A drawer-based file browser accessible via "Open Browser" button on the node.
+    *   **Interactive UI**: A drawer-based file browser accessible via "Open/Connect to Map browser" button on the node.
     *   **Grid View**: Responsive grid displaying cached maps with lazy loading and cache busting.
     *   **Filtering**: Tabs for different map types and a search bar for filename/tag filtering.
     *   **Overlay Mode**: Ability to overlay the "original" source image on top of maps with adjustable opacity and blend modes (luminosity, multiply, etc.) for visual alignment verification.

@@ -134,7 +134,7 @@ app.registerExtension({
           ? onNodeCreated.apply(this, arguments)
           : undefined;
 
-        this.addWidget("button", "Open Browser", "open", async () => {
+        this.addWidget("button", "Open/Connect to Map browser", "open", async () => {
           if (!this.drawer) this.drawer = await getDrawer();
           if (!this.drawer) return;
 

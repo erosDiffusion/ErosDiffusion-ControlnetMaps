@@ -4,7 +4,7 @@
       "cache_path": "D:\\ComfyUI7\\ComfyUI\\input\\maps",
       "extra_path": "",
       "filename": "openpose/dbaf017ceace7491a6cf6045767763f1.png",
-      "Open Browser": "open",
+      "Open/Connect to Map browser": "open",
       "Run": "run"
     },
     "class_type": "CacheMapBrowserNode",
