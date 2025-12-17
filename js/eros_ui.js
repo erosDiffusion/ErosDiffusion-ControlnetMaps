@@ -35,7 +35,13 @@ export async function confirmDialog({
   try {
     const dlg = app?.extensionManager?.dialog;
     if (dlg && typeof dlg.confirm === "function") {
-      const result = await dlg.confirm({ title, message, type, itemList, hint });
+      const result = await dlg.confirm({
+        title,
+        message,
+        type,
+        itemList,
+        hint,
+      });
       return !!result;
     }
   } catch (e) {}

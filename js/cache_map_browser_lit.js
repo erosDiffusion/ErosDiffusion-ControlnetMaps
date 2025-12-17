@@ -1220,9 +1220,7 @@ export class ErosLitBrowser extends LitElement {
               ?disabled=${this._busyImport}
               @click=${() => {
                 try {
-                  const inp = this.shadowRoot.getElementById(
-                    "eros-import-zip"
-                  );
+                  const inp = this.shadowRoot.getElementById("eros-import-zip");
                   inp && inp.click();
                 } catch (e) {}
               }}
@@ -1233,7 +1231,9 @@ export class ErosLitBrowser extends LitElement {
             <button
               class="eros-btn-small"
               style="font-size:12px;padding:2px 8px;background:#8b2a2a;"
-              ?disabled=${this._busyReset || this._busyImport || this._busyExport}
+              ?disabled=${this._busyReset ||
+              this._busyImport ||
+              this._busyExport}
               @click=${async () => {
                 if (this._busyReset) return;
                 const ok = await confirmDialog({
