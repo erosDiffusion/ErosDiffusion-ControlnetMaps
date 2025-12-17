@@ -498,6 +498,15 @@ class ErosLitSidebar extends LitElement {
                   })
                 )}
             />
+            <div style="font-size:11px;color:#8ca0b3;margin:6px 0 4px;">
+              <div>shift+click: tag selected</div>
+              <div>
+                click: filter / switch filter (filters mutually exclusive)
+              </div>
+              <div>
+                ctrl+click: add/remove tag to filter selection ("and" filtering)
+              </div>
+            </div>
             <div class="eros-tag-chips">
               ${Array.from(this.allTags || []).map(([name, count]) => {
                 if (!name) return null;
@@ -544,7 +553,7 @@ class ErosLitSidebar extends LitElement {
             class="eros-tag-section-content"
             style="display:${this.collapsed.selected ? "none" : "flex"}"
           >
-            ${!this.hasSelection
+            ${!this.selectedFilename
               ? html`<div style="font-size:10px; color:#666;">
                   Select an image...
                 </div>`
@@ -609,35 +618,37 @@ class ErosLitSidebar extends LitElement {
                       🤖
                     </button>
                   </div>
-                  <div
-                    style="display:flex; flex-direction:column; gap:6px; margin-top:8px;"
-                  >
-                    <label
-                      style="font-size:12px; display:flex; align-items:center; gap:8px;"
-                    >
-                      <input
-                        type="checkbox"
-                        id="del-all"
-                        @click=${(e) => {
-                          e.stopPropagation();
-                          this._deleteAllFlag = e.target.checked;
-                        }}
-                      />
-                      Delete all maps for original
-                    </label>
-                    <div>
-                      <button
-                        class="eros-btn"
-                        style="background:#8b2a2a; color:white;"
-                        @click=${(e) => {
-                          e.stopPropagation();
-                          this._onDelete();
-                        }}
+                  ${this.selectedFilename
+                    ? html`<div
+                        style="display:flex; flex-direction:column; gap:6px; margin-top:8px;"
                       >
-                        Delete Map
-                      </button>
-                    </div>
-                  </div>
+                        <label
+                          style="font-size:12px; display:flex; align-items:center; gap:8px;"
+                        >
+                          <input
+                            type="checkbox"
+                            id="del-all"
+                            @click=${(e) => {
+                              e.stopPropagation();
+                              this._deleteAllFlag = e.target.checked;
+                            }}
+                          />
+                          Delete all maps for original
+                        </label>
+                        <div>
+                          <button
+                            class="eros-btn"
+                            style="background:#8b2a2a; color:white;"
+                            @click=${(e) => {
+                              e.stopPropagation();
+                              this._onDelete();
+                            }}
+                          >
+                            Delete Map
+                          </button>
+                        </div>
+                      </div>`
+                    : ""}
                 `}
           </div>
         </div>
