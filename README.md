@@ -63,6 +63,7 @@ please go to your extension directory, and in a terminal from the extension fold
 
 
 ### Video preview for usage (slightly older version)
+
 https://github.com/user-attachments/assets/f7881a43-2fc4-41ca-9655-8090d4b42c64
 
 ## Overview
@@ -93,7 +94,8 @@ You can as well import and export the data set with the tags. to share it.
 - Responsive image column and sizing
 
 ## Example Workflows 
-There are three workflows preset in the workflow examples folder
+
+There are **three workflows** preset in the workflow examples folder
 You also find them in the ComfyUI templates sidebar
 
   <img width="2005" height="1298" alt="image" src="https://github.com/user-attachments/assets/0431e3fa-792e-4346-a592-6092164f468d" />
