@@ -4,6 +4,30 @@
  * Year: 2025
  */
 
+// Ensure ComfyUI websocket messages for `eros.*` are forwarded to window
+// as DOM CustomEvents. Register early (module load) so listeners exist
+// before an execution run starts and messages aren't reported as unknown.
+try {
+  if (window.api && typeof api.addEventListener === "function") {
+    const forward = (type) => {
+      try {
+        api.addEventListener(type, (ev) => {
+          try {
+            const payload = (ev && (ev.data || ev.detail)) || ev;
+            window.dispatchEvent(new CustomEvent(type, { detail: payload }));
+          } catch (e) {}
+        });
+      } catch (e) {}
+    };
+    [
+      "eros.tags.updated",
+      "eros.image.deleted",
+      "eros.map.saved",
+      "eros.image.saved",
+    ].forEach(forward);
+  }
+} catch (e) {}
+
 import { app } from "../../scripts/app.js";
 import {
   html,
@@ -763,6 +787,70 @@ export class ErosLitBrowser extends LitElement {
       this._sidebarMethod
     );
     this.cache.loadTags();
+    // Use the Comfy `api` event system to forward backend `eros.*` messages
+    // into DOM CustomEvents so the rest of the UI can listen for them.
+    try {
+      if (window.api && typeof window.api.addEventListener === "function") {
+        const forward = (type) => {
+          try {
+            api.addEventListener(type, (ev) => {
+              try {
+                // ev may already carry the payload in different shapes; prefer ev.data, then ev.detail, then ev
+                const payload = (ev && (ev.data || ev.detail)) || ev;
+                window.dispatchEvent(
+                  new CustomEvent(type, { detail: payload })
+                );
+              } catch (e) {}
+            });
+          } catch (e) {}
+        };
+        [
+          "eros.tags.updated",
+          "eros.image.deleted",
+          "eros.map.saved",
+          "eros.image.saved",
+        ].forEach(forward);
+      }
+    } catch (e) {}
+    // Listen for backend-driven updates (tags, image deleted/saved) so the
+    // sidebar refreshes immediately when maps are created/deleted/tags change.
+    this._onTagsUpdated = async (ev) => {
+      try {
+        await this.cache.loadTags();
+        await this.fetchFiles(false, true);
+        this.requestUpdate();
+      } catch (e) {}
+    };
+    this._onImageDeleted = async (ev) => {
+      try {
+        await this.fetchFiles(false, true);
+        await this.cache.loadTags();
+        this.requestUpdate();
+      } catch (e) {}
+    };
+    this._onMapSaved = async (ev) => {
+      try {
+        // map saved may include basename/type; force full refresh.
+        // Filesystem visibility can lag; do an immediate refresh and a
+        // delayed retry to ensure new files appear reliably.
+        await this.fetchFiles(false, true);
+        await this.cache.loadTags();
+        this.requestUpdate();
+        setTimeout(async () => {
+          try {
+            await this.fetchFiles(false, true);
+            await this.cache.loadTags();
+            this.requestUpdate();
+          } catch (e) {}
+        }, 350);
+      } catch (e) {}
+    };
+    try {
+      window.addEventListener("eros.tags.updated", this._onTagsUpdated);
+      window.addEventListener("eros.image.deleted", this._onImageDeleted);
+      window.addEventListener("eros.map.saved", this._onMapSaved);
+      window.addEventListener("eros.image.saved", this._onMapSaved);
+    } catch (e) {}
     // Default to 'original' when opened manually (no linked node)
     if (!this.currentTab) this.currentTab = "original";
     try {
@@ -777,6 +865,12 @@ export class ErosLitBrowser extends LitElement {
   disconnectedCallback() {
     try {
       this._removeContainerFix();
+    } catch (e) {}
+    try {
+      window.removeEventListener("eros.tags.updated", this._onTagsUpdated);
+      window.removeEventListener("eros.image.deleted", this._onImageDeleted);
+      window.removeEventListener("eros.map.saved", this._onMapSaved);
+      window.removeEventListener("eros.image.saved", this._onMapSaved);
     } catch (e) {}
     try {
       super.disconnectedCallback();

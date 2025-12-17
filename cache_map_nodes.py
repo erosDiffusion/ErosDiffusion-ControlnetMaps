@@ -272,6 +272,9 @@ class CacheMapNode:
         # Set up a defer-notify set when doing batch generation so we can
         # send frontend updates only after all maps are processed.
         notify_on_complete = None
+        # Collect saved map info during this run so we can emit a single
+        # `eros.map.saved` notification once at the end (avoids multiple refreshes)
+        saved_maps = []
         if generate_all:
             notify_on_complete = set()
             print(f"[CacheMap] Processing 'Generate All' for {filename}...")
@@ -298,6 +301,11 @@ class CacheMapNode:
 
                         # Save tags when generating/regenerating; defer frontend notify
                         save_tags_for_image(filename, tags_str)
+                        # Record saved map for end-of-run notification
+                        try:
+                            saved_maps.append({"basename": os.path.splitext(os.path.basename(filename))[0], "type": type_check, "path": save_path})
+                        except Exception:
+                            pass
                     else:
                         print(f"[CacheMap] Generate All: Skipped {type_check} (Exists)")
 
@@ -318,6 +326,10 @@ class CacheMapNode:
 
                     # Save tags for original image (defer notify)
                     save_tags_for_image(filename, tags_str)
+                    try:
+                        saved_maps.append({"basename": os.path.splitext(os.path.basename(filename))[0], "type": "original", "path": save_path})
+                    except Exception:
+                        pass
 
         # Process Single Flow (saving source_original if present)
         # We check this every run if connected, to ensure overlay availability
@@ -340,6 +352,10 @@ class CacheMapNode:
                      
                      # Save tags for original image
                      save_tags_for_image(filename, tags_str)
+                     try:
+                         saved_maps.append({"basename": os.path.splitext(os.path.basename(filename))[0], "type": "original", "path": save_path})
+                     except Exception:
+                         pass
 
         # Resolve 'auto' to actual type if possible (for saving) or just load existing
         target_type = map_type
@@ -402,6 +418,10 @@ class CacheMapNode:
 
             # Save tags when generating/regenerating
             save_tags_for_image(filename, tags_str)
+            try:
+                saved_maps.append({"basename": os.path.splitext(os.path.basename(filename))[0], "type": target_type, "path": save_path})
+            except Exception:
+                pass
 
         # After all processing, if we deferred notifications for batch ops,
         # send a single update per basename to the frontend so it only refreshes once.
@@ -413,6 +433,14 @@ class CacheMapNode:
                     PromptServer.instance.send_sync("eros.tags.updated", {"basename": basename, "tags": saved_tags})
                 except Exception as e:
                     print(f"[CacheMap] Error sending batch tag update for '{basename}': {e}")
+
+        # Notify frontend once about all saved maps in this run so the browser
+        # can refresh a single time and reapply filters.
+        if saved_maps:
+            try:
+                PromptServer.instance.send_sync("eros.map.saved", {"saved": saved_maps})
+            except Exception:
+                pass
 
         return (generated_map,)
 
