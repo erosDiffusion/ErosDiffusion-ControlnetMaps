@@ -918,35 +918,7 @@ export class ErosLitBrowser extends LitElement {
   }
 
   firstUpdated() {
-    // Resize Handler Logic
-    const handle = this.shadowRoot.querySelector(".eros-drawer-resize-handle");
-    const drawer = this.shadowRoot.getElementById("drawer");
-
-    if (handle && drawer) {
-      let isResizing = false;
-      let startX, startWidth;
-
-      handle.addEventListener("mousedown", (e) => {
-        isResizing = true;
-        startX = e.clientX;
-        startWidth = drawer.getBoundingClientRect().width;
-        document.body.style.cursor = "ew-resize";
-        e.preventDefault(); // Prevent text selection
-      });
-
-      document.addEventListener("mousemove", (e) => {
-        if (!isResizing) return;
-        const newWidth = startWidth - (e.clientX - startX);
-        if (newWidth > 300 && newWidth < 1200) {
-          drawer.style.width = newWidth + "px";
-        }
-      });
-
-      document.addEventListener("mouseup", () => {
-        isResizing = false;
-        document.body.style.cursor = "";
-      });
-    }
+    // Resize handled by ComfyUI sidebar now — no-op.
   }
 
   render() {
@@ -1021,7 +993,7 @@ export class ErosLitBrowser extends LitElement {
       </style>
 
       <div class="eros-drawer ${this.isOpen ? "open" : ""}" id="drawer">
-        <div class="eros-drawer-resize-handle"></div>
+        <!-- resize handle removed: sizing controlled by ComfyUI sidebar -->
 
         <div class="eros-drawer-header">
           <div style="display:flex;align-items:center;gap:10px;">
