@@ -50,6 +50,7 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 ## Changelog
 **07.01.2026 - 15:02**
 - published to comfy registry
+- udpaded workflows and readme
 
 **17.12.2025 - 17.22**
 

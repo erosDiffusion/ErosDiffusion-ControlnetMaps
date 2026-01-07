@@ -1,7 +1,7 @@
 [project]
 name = "erosdiffusion-controlnetmaps"
 description = "Generate, Browse, Organize, Share and Re-Use ControlNet Maps"
-version = "1.0.1"
+version = "1.0.2"
 license = {text = "MIT License"}
 # classifiers = [
 #     # For OS-independent nodes (works on all operating systems)
