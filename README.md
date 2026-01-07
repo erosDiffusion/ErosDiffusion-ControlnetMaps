@@ -13,10 +13,22 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 
 ## Installation
+Option 1 (**with comfy ui manager**):
 
+1. search for ControlnetMaps and install
+<img width="1348" height="265" alt="image" src="https://github.com/user-attachments/assets/97477570-3219-44be-827d-d7681d10df88" />
+
+1.1 _optional_, if you need to generate maps you can install comfyui_controlnet_aux
+<img width="1349" height="234" alt="image" src="https://github.com/user-attachments/assets/d4e855ff-dbf5-4998-988a-c3ad5fd28294" />
+
+
+
+Option 2 (**Manual installation**):
 1. **Clone** this folder into your ComfyUI `custom_nodes` directory:
    1. `cd <your comfy ui custom_nodes directory>`   
-   1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`  
+   1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`
+  
+After installation    
 2. **Restart ComfyUI**: the nodes appear under the `ErosDiffusion` category or in the templates.
 3. **Optional** open the "ControlNet Maps Browser" sidebar and import this file:
 
@@ -27,11 +39,12 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
    <img width="866" height="709" alt="image" src="https://github.com/user-attachments/assets/d165f3c4-1545-4e80-8c6f-33ad882ee45d" />
 
 
-
+Do you already have maps ?
+...and don't want to generate them ? paste them in the input/maps folder under the proper folder! files are synchronized by name.
 
 ## Usage (all workflows are accessible from comfyUi templates)
 
-3. **generateMaps**: open the baseWorkflowCanny from templates to generate your first map and cache it. pick a photo you licke and run. the map will now be available under "canny" filter and "original".
+3. **generateMaps**: open the baseWorkflowCanny from templates to generate your first map and cache it. pick a photo you licke and run. the map will now be available under "canny" filter and "original". this workflow requires no additional dependency.
 4. **useMaps**: to select the map and use it choose the useCachedMaps workflow. open the Controlnet Map Browser sidebar and connect the node using the button "Open/Connect to map browser" in the map browser node. select a cached map. run the flow.
 5. **optional**, to **generate all maps** use the generateMaps workflow (requires you to install the map generator node).
 
