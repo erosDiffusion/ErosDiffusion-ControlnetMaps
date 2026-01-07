@@ -12,17 +12,19 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 
 ## Installation
-Option 1 (**with comfy ui manager**):
+### Option 1 (**with comfy ui manager**):
 
 1. search for ControlnetMaps and install
-<img width="1348" height="265" alt="image" src="https://github.com/user-attachments/assets/97477570-3219-44be-827d-d7681d10df88" />
+  <img width="1348" height="265" alt="image" src="https://github.com/user-attachments/assets/97477570-3219-44be-827d-d7681d10df88" />
 
-1.1 _optional_, if you need to generate maps you can install comfyui_controlnet_aux
+1.1. _optional_, if you need to generate maps you can install comfyui_controlnet_aux
+
 <img width="1349" height="234" alt="image" src="https://github.com/user-attachments/assets/d4e855ff-dbf5-4998-988a-c3ad5fd28294" />
 
 
 
-Option 2 (**Manual installation**):
+### Option 2 (**Manual installation**):
+
 1. **Clone** this folder into your ComfyUI `custom_nodes` directory:
    1. `cd <your comfy ui custom_nodes directory>`   
    1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`
