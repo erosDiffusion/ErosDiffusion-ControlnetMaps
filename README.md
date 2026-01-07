@@ -134,7 +134,7 @@ You also find them in the ComfyUI templates sidebar
 - [ ] Implement automatic map generation (we'll see, AIO there's plugins for that)
 
 ## Contributing
-
+- have you created a stunning set of controlnet maps ? give me a link to the donwload and I will feature them here!
 - PRs welcome. Keep changes focused and add tests/examples where possible. Test it and tell me what's wrong.
 
 ## Supporting
