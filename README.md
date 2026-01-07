@@ -143,7 +143,7 @@ You also find them in the ComfyUI templates sidebar
 
 ## Further Roadmap
 - [x] Provide downloadable starter import .zip
-- [ ] Integrate with ComfyUI Registry
+- [x] Integrate with ComfyUI Registry
 - [ ] Test and Optimize for large number of images
 - [ ] Implement automatic tagging
 - [ ] Implement automatic map generation (we'll see, AIO there's plugins for that)
