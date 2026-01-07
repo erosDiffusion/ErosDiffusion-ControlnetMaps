@@ -6,7 +6,7 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 
 > [!WARNING]
-> This is an **beta** stage plugin and as such it might change often.
+> This is a **beta** stage plugin and as such it might change often.
 > If you want to support development feel free to [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
 
