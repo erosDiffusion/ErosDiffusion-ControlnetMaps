@@ -5,8 +5,8 @@ Save resources by skipping already done work!
 Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 
 
-> [!note]
-> This is an **Alpha** stage plugin and as such it will change often.
+> [!CAUTION]
+> This is an **$${\color{red}Alpha}$$** stage plugin and as such it will change often.
 > For this reason, as it might be unstable, it's not yet integrated with ComfyUI manager / Registry.
 > If you want to support development feel free to [donate](https://donate.stripe.com/3cI7sDgZg4rr2Ln0HfcV202)
 
@@ -35,14 +35,16 @@ Generate, tag, cache, search and use ControlNet maps inside ComfyUI.
 4. **useMaps**: to select the map and use it choose the useCachedMaps workflow. open the Controlnet Map Browser sidebar and connect the node using the button "Open/Connect to map browser" in the map browser node. select a cached map. run the flow.
 5. **optional**, to **generate all maps** use the generateMaps workflow (requires you to install the map generator node).
 
-
 > [!important]
 > **This node does NOT generate the maps**:
 > - It helps you organize in a well known folder input/maps them and use them fast via browser.
 > - To generate the maps you will need other nodes ([Aio AUX preprocessor](https://github.com/Fannovel16/comfyui_controlnet_aux), [depth anything v2](https://github.com/kijai/ComfyUI-DepthAnythingV2) or  [depth anything v3](https://github.com/PozzettiAndrea/ComfyUI-DepthAnythingV3), canny (from comfy core) or whatever you like/need!)
 
+### But wait... do you have to generate maps if you already have some ?
 
-
+**Not at all !** -  **If you have some just copy them in the appropriate folder** (input/maps/<type>) and refresh
+(images that don't have an equivalent name in another folder won't show the original overlay and when switching type won't match anything), no need to generate them!
+<img width="625" height="513" alt="image" src="https://github.com/user-attachments/assets/fe2f43c0-a123-446a-b82b-1c3640da4333" />
 
 
 ## Changelog
