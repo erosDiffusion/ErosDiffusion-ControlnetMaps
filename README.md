@@ -28,7 +28,8 @@ Option 2 (**Manual installation**):
    1. `cd <your comfy ui custom_nodes directory>`   
    1. `git clone https://github.com/erosDiffusion/ComfyUI-ErosDiffusion-ControlnetMaps.git`
   
-After installation    
+### After installation    
+
 2. **Restart ComfyUI**: the nodes appear under the `ErosDiffusion` category or in the templates.
 3. **Optional** open the "ControlNet Maps Browser" sidebar and import this file:
 
@@ -39,7 +40,7 @@ After installation
    <img width="866" height="709" alt="image" src="https://github.com/user-attachments/assets/d165f3c4-1545-4e80-8c6f-33ad882ee45d" />
 
 
-Do you already have maps ?
+### Do you already have maps ?
 ...and don't want to generate them ? paste them in the input/maps folder under the proper folder! files are synchronized by name.
 
 ## Usage (all workflows are accessible from comfyUi templates)
